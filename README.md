@@ -1,6 +1,6 @@
 # TFT Stat Tracker
 
-> Full stack Vue/Express app using the RIOT API to track player stats
+> Full stack Vue/Express app using the Riot API to track player stats
 
 ## Quick Start
 
@@ -27,4 +27,5 @@ npm run build
 
 ### Status
 
+Check out WIP (https://pacific-fjord-96230.herokuapp.com/)
 NOT COMPLETED
