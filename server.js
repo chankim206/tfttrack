@@ -12,6 +12,12 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use("/api/v1/profile", require("./routes/profile"));
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(__dirname + "/public"));
+
+  app.get(/.*/, (req, res) => res.sendFile(__dirname + "/public/index.html"));
+}
+
 app.listen(port, () => {
   console.log(`app started on ${process.env.NODE_ENV} mode on port ${port}`);
 });
