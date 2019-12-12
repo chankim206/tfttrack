@@ -24,26 +24,57 @@
           class="summoner-icon"
         />
         {{ profileData.meta.name }}
+        <div class="fireplace">
+          <i v-if="profileData.stats && profileData.stats.hotStreak" class="fas fa-fire-alt on"></i>
+          <i v-else class="fas fa-fire-alt off"></i>
+          <p v-if="profileData.stats && profileData.stats.hotStreak" class="fire">On Fire</p>
+          <p v-else class="fire">Off Fire</p>
+        </div>
       </h1>
       <div class="grid">
-        <div v-if="profileData.stats">
+        <div v-if="profileData.stats" class="rankicon">
           <img
             :src="getImgUrl(profileData.stats)"
             :alt="profileData.stats.tier + roman(profileData.stats.rank)"
           />
         </div>
-        <div v-else>
+        <div v-else class="rankicon">
           <img :src="getImgUrl(profileData.stats)" :alt="'Unranked'" />
         </div>
         <div>
           <ul>
             <li v-if="profileData.stats">
               <h4>Current Rank</h4>
-              <p>{{getRank(profileData.stats.tier, profileData.stats.rank)}}</p>
+              <p>{{getRank(profileData.stats.tier, profileData.stats.rank)}} {{profileData.stats.leaguePoints}}LP</p>
+              <div class="border">
+                <div
+                  class="progress"
+                  v-bind:style="{width: getWidth(profileData.stats.tier, profileData.stats.leaguePoints) + '%'}"
+                ></div>
+              </div>
             </li>
             <li v-else>
               <h4>Current Rank</h4>
               <p>Unranked</p>
+              <div class="border">
+                <div class="progress"></div>
+              </div>
+            </li>
+            <li v-if="profileData.stats">
+              <div class="mini-grid">
+                <div>
+                  <h4>Total</h4>
+                  <p>{{profileData.stats.wins + profileData.stats.losses}}</p>
+                </div>
+                <div>
+                  <h4>Wins</h4>
+                  <p>{{profileData.stats.wins}}</p>
+                </div>
+                <div>
+                  <h4>Losses</h4>
+                  <p>{{profileData.stats.losses}}</p>
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -76,6 +107,9 @@ export default {
       );
 
       this.profileData = response.data;
+      if (this.profileData.stats) {
+        this.current = this.profileData.stats.leaguePoints + "%";
+      }
       this.loading = false;
     } catch (err) {
       this.loading = false;
@@ -113,6 +147,17 @@ export default {
       } else {
         return tier + " " + this.roman(rank);
       }
+    },
+    getWidth(tier, lp) {
+      const GM = "GrandMaster";
+      const M = "Master";
+      const C = "Challenger";
+      tier = tier.charAt(0) + tier.slice(1).toLowerCase();
+      if (tier === GM || tier === M || tier === C) {
+        return 100;
+      } else {
+        return lp;
+      }
     }
   }
 };
@@ -126,6 +171,45 @@ export default {
   margin: 1rem auto;
   padding: 2rem 1.5rem;
   border-radius: 20px;
+  overflow: hidden;
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1rem;
+}
+
+.fireplace {
+  display: block;
+  margin-left: 0.5rem;
+}
+
+.fa-fire-alt {
+  display: block;
+}
+
+.fire {
+  font-size: 0.5rem;
+}
+
+.on {
+  color: #f62817;
+}
+
+.off {
+  color: #ccc;
+}
+
+.border {
+  border: 1px solid #fff;
+  border-radius: 3px;
+}
+
+.progress {
+  background-color: #fff;
+  height: 0.5rem;
+  width: 0%;
 }
 
 h1.summoner {
@@ -137,6 +221,7 @@ h1.summoner {
   margin-bottom: 3rem;
   display: flex;
   align-items: center;
+  justify-content: space-around;
 }
 
 .summoner-icon {
@@ -156,7 +241,7 @@ a:hover {
 }
 
 img {
-  width: 100%;
+  width: 90%;
 }
 
 .grid {
@@ -175,7 +260,7 @@ li p {
   font-size: 2rem;
 }
 li:first-child p {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 li span {
   font-size: 1rem;
@@ -183,6 +268,13 @@ li span {
 }
 
 @media (max-width: 500px) {
+  .rankicon {
+    display: flex;
+    justify-content: center;
+  }
+  img {
+    width: 70%;
+  }
   h1 {
     font-size: 1.5rem;
     display: block;
